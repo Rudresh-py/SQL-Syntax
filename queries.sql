@@ -174,3 +174,33 @@ WHERE column_name IN (SELECT STATEMENT);
 SELECT column_name(s)
 FROM table_name
 WHERE column_name BETWEEN value1 AND value2;
+
+-- Alias Column Syntax
+SELECT column_name AS alias_name
+FROM table_name;
+
+-- Alias Table Syntax
+SELECT column_name(s)
+FROM table_name AS alias_name;
+
+-- Example
+SELECT CustomerID AS ID, CustomerName AS Customer
+FROM Customers;
+-- The following SQL statement creates two aliases, one for the CustomerName column and one for the ContactName column. Note: It requires double quotation marks or square brackets if the alias name contains spaces:
+
+-- Example
+SELECT CustomerName AS Customer, ContactName AS [Contact Person]
+FROM Customers;
+-- The following SQL statement creates an alias named "Address" that combine four columns (Address, PostalCode, City and Country):
+
+-- Example
+SELECT CustomerName, Address + ', ' + PostalCode + ' ' + City + ', ' + Country AS Address
+FROM Customers;
+-- Note: To get the SQL statement above to work in MySQL use the following:
+
+SELECT CustomerName, CONCAT(Address,', ',PostalCode,', ',City,', ',Country) AS Address
+FROM Customers;
+-- Note: To get the SQL statement above to work in Oracle use the following:
+
+SELECT CustomerName, (Address || ', ' || PostalCode || ' ' || City || ', ' || Country) AS Address
+FROM Customers;
