@@ -1,3 +1,10 @@
+-- CREATE DATABASE Syntax
+CREATE DATABASE databasename;
+
+-- DROP DATABASE Syntax
+DROP DATABASE databasename;
+
+
 SELECT - extracts data from a database
 UPDATE - updates data in a database
 DELETE - deletes data from a database
@@ -247,3 +254,102 @@ WHERE condition;
 SELECT column_name(s)
 FROM table1 T1, table1 T2
 WHERE condition;
+
+
+-- UNION Syntax
+SELECT column_name(s) FROM table1
+UNION
+SELECT column_name(s) FROM table2;
+
+
+-- UNION ALL Syntax
+-- The UNION operator selects only distinct values by default. To allow duplicate values, use UNION ALL:
+SELECT column_name(s) FROM table1
+UNION ALL
+SELECT column_name(s) FROM table2;
+
+
+-- GROUP BY Syntax
+SELECT column_name(s)
+FROM table_name
+WHERE condition
+GROUP BY column_name(s)
+ORDER BY column_name(s);
+
+
+-- HAVING Syntax
+SELECT column_name(s)
+FROM table_name
+WHERE condition
+GROUP BY column_name(s)
+HAVING condition
+ORDER BY column_name(s);
+
+
+-- EXISTS Syntax
+SELECT column_name(s)
+FROM table_name
+WHERE EXISTS
+(SELECT column_name FROM table_name WHERE condition);
+
+
+-- ANY Syntax
+SELECT column_name(s)
+FROM table_name
+WHERE column_name operator ANY
+  (SELECT column_name
+  FROM table_name
+  WHERE condition);
+
+SELECT ALL column_name(s)
+FROM table_name
+WHERE condition;
+
+-- ALL Syntax With WHERE or HAVING
+SELECT column_name(s)
+FROM table_name
+WHERE column_name operator ALL
+  (SELECT column_name
+  FROM table_name
+  WHERE condition);
+
+
+-- Stored Procedure Syntax
+CREATE PROCEDURE procedure_name
+AS
+sql_statement
+GO;
+
+
+CREATE DEFINER=`admin`@`%` PROCEDURE `getReUsers`(IN limit INT, IN offset INT, IN userSearch VARCHAR(50), IN uId INT)
+BEGIN
+    SET @db_name = DATABASE();
+    SET @whereCondition = '';
+
+    IF userSearch IS NOT NULL AND uId IS NULL THEN
+        SET @whereCondition = CONCAT('AND (firstName LIKE "%', userSearch, '%" OR surName LIKE "%', userSearch, '%")');
+    END IF;
+
+    IF userSearch IS NULL AND uId IS NOT NULL THEN
+        SET @whereCondition = CONCAT(' AND userId = ', _uId);
+    END IF;
+
+    SET @_condition = CONCAT( ' LIMIT ', limit, ' OFFSET ', offset);
+
+    SET @sql = CONCAT(
+        'SELECT ',
+        (SELECT REPLACE(GROUP_CONCAT(COLUMN_NAME), 'password,', '')
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME = 're_developer' AND TABLE_SCHEMA = @db_name),
+        ' FROM re_developer WHERE isActive = true ',@whereCondition, @_condition
+    );
+
+	SET @totalCount = CONCAT('SELECT COUNT(*)  as totalCount FROM re_developer WHERE isActive = true ', @whereCondition);
+
+    PREPARE stmt1 FROM @sql;
+    EXECUTE stmt1;
+    PREPARE stmt2 FROM @totalCount;
+    EXECUTE stmt2;
+END
+
+Call getReUsers(10, 0, null,  56)
