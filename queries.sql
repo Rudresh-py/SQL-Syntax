@@ -353,3 +353,8 @@ BEGIN
 END
 
 Call getReUsers(10, 0, null,  56)
+
+	
+-- Syntax of Lag function
+LAG (scalar_expression [,offset] [,default])  
+OVER ( [ partition_by_clause ] order_by_clause )
